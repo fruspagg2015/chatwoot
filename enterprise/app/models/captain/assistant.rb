@@ -129,6 +129,7 @@ class Captain::Assistant < ApplicationRecord
     tools = self.class.built_in_agent_tools.dup
 
     tools.concat(custom_tools.enabled.map(&:to_tool_metadata))
+    tools.concat(mcp_servers.enabled.flat_map(&:tool_metadata))
 
     tools
   end
@@ -136,8 +137,11 @@ class Captain::Assistant < ApplicationRecord
   def available_tool_ids = available_agent_tools.pluck(:id)
 
   def known_tool_ids
-    self.class.built_in_tool_ids + custom_tools.pluck(:slug)
+    self.class.built_in_tool_ids + custom_tools.pluck(:slug) + mcp_servers.flat_map(&:captain_tool_names)
   end
+
+  # One instance per assistant record, so each MCP server is listed once while the agents of a run are built
+  def mcp_agent_tools = @mcp_agent_tools ||= Captain::Mcp::AgentTools.new(self)
 
   def push_event_data
     assistant_event_data
@@ -208,7 +212,8 @@ class Captain::Assistant < ApplicationRecord
     [
       self.class.resolve_tool_class('faq_lookup').new(self),
       self.class.resolve_tool_class('handoff').new(self),
-      *custom_tools.enabled.map { |custom_tool| custom_tool.tool(self) }
+      *custom_tools.enabled.map { |custom_tool| custom_tool.tool(self) },
+      *mcp_agent_tools.tools
     ]
   end
 

@@ -117,6 +117,21 @@ class Captain::McpServer < ApplicationRecord
     tools.select { |tool| tool['enabled'] && tool.dig('approved_definition', 'read_only') }
   end
 
+  def captain_tool_names
+    tools.map { |tool| captain_tool_name(tool['name']) }
+  end
+
+  # Scenarios list and reference these tools by their Captain name
+  def tool_metadata
+    available_tools.map do |tool|
+      { id: captain_tool_name(tool['name']), title: tool['name'], description: tool.dig('approved_definition', 'description'), mcp: true }
+    end
+  end
+
+  def requires_email_verification?
+    available_tools.any? { |tool| self.class.requires_email_verification?(tool) }
+  end
+
   def approved_tool(server_tool_name)
     tools.find { |tool| tool['name'] == server_tool_name }
   end
