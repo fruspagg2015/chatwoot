@@ -42,7 +42,7 @@ class Captain::Mcp::AgentTools
   end
 
   def tools(base_class: Captain::Tools::PublicMcpTool)
-    @assistant.mcp_servers.enabled.flat_map do |server|
+    Captain::McpServer.usable_for(@assistant).flat_map do |server|
       matching_entries(server).map { |entry| self.class.build(@assistant, server, entry, @connections[server.id], base_class: base_class) }
     end
   end

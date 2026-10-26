@@ -5,6 +5,8 @@ class Captain::Mcp::ToolChangeCheckJob < ApplicationJob
 
   def perform
     Captain::McpServer.enabled.where.not(tools: []).find_each do |server|
+      next unless server.account.feature_enabled?(Captain::McpServer::FEATURE_FLAG)
+
       connection = Captain::Mcp::Connection.new(server)
       server.record_tool_changes(connection.track_status { connection.tool_definitions })
     rescue *Captain::Mcp::Connection::ERRORS => e

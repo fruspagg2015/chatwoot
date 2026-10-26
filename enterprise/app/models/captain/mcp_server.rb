@@ -78,6 +78,11 @@ class Captain::McpServer < ApplicationRecord
 
   scope :enabled, -> { where(enabled: true) }
 
+  # The servers Captain may use for an assistant: none while the account does not have MCP servers turned on
+  def self.usable_for(assistant)
+    assistant.account.feature_enabled?(FEATURE_FLAG) ? assistant.mcp_servers.enabled : none
+  end
+
   # Keys are sorted first, so the same definition always has the same digest. The name is stored beside it.
   def self.definition_digest(definition)
     "sha256:#{Digest::SHA256.hexdigest(JSON.generate(sorted_keys(definition.deep_stringify_keys.except('name'))))}"
