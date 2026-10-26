@@ -319,3 +319,8 @@
   enabled: false
   premium: true
   column: feature_flags_ext_1
+- name: captain_mcp_servers
+  display_name: Captain MCP servers
+  enabled: false
+  premium: true
+  column: feature_flags_ext_1
