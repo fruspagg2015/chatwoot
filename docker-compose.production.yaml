@@ -45,7 +45,7 @@ services:
       - POSTGRES_DB=chatwoot
       - POSTGRES_USER=postgres
       # Please provide your own password.
-      - POSTGRES_PASSWORD="DM7xQ24YFz0e9y5jOB8dpgPR"
+      - POSTGRES_PASSWORD="$POSTGRES_PASSWORD"
 
   redis:
     image: redis:alpine
@@ -55,7 +55,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - '6379:6379'
+      - '6379'
 
 volumes:
   storage_data:
